@@ -17,6 +17,12 @@ A high-performance real-time multiplayer game server implementation in C++ with 
 - **Web Client**: Web interface for testing and playing
 - **C# Client SDK**: Easy-to-use SDK for game client integration
 
+Real-time matchmaking on multiple browsers
+
+<img width="500" height="284" alt="Screenshot 2025-12-24 at 2 30 16 PM" src="https://github.com/user-attachments/assets/8348bb38-16e3-4d15-a1c2-33938f7d8be3" />
+<img width="500" height="284" alt="Screenshot 2025-12-24 at 2 31 18 PM" src="https://github.com/user-attachments/assets/98210ad2-e78f-4e1e-8ac6-b9ce9dcd9a68" />
+
+
 ## Building the Server
 
 ### Prerequisites
