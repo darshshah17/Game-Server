@@ -11,17 +11,15 @@ A high-performance real-time multiplayer game server implementation in C++ with 
 - **Matchmaking System**: Automatic player matching based on game mode and player count
 - **Chat System**: Global and channel-based chat messaging
 - **Client-side Prediction**: Instant local feedback for smooth player experience
-- **Web Demo Client**: Beautiful dark-themed web interface for testing and playing
-- **C# Client SDK**: Easy-to-use SDK for game client integration (Unity/Godot compatible)
+- **Web Client**: Web interface for testing and playing
+- **C# Client SDK**: Easy-to-use SDK for game client integration
 
 ## Building the Server
 
 ### Prerequisites
 
-- C++17 compatible compiler (GCC 7+, Clang 5+, MSVC 2017+)
-- CMake 3.15+
-- libwebsockets library (installed via Homebrew on macOS: `brew install libwebsockets`)
-- jsoncpp library (installed via Homebrew on macOS: `brew install jsoncpp`)
+- libwebsockets
+- jsoncpp
 
 ### Build Steps
 
@@ -52,54 +50,6 @@ cd server/build
 cd sdk
 dotnet build
 ```
-
-### Using the SDK
-
-Add a reference to the SDK in your project:
-
-```xml
-<ProjectReference Include="path/to/GameServerSDK.csproj" />
-```
-
-Or install as a NuGet package (if published).
-
-## Usage Example
-
-### C# Client
-
-```csharp
-using GameServerSDK;
-
-var sdk = new GameServerSDK("ws://localhost:8080");
-
-sdk.OnMatchFound += (sender, e) => {
-    Console.WriteLine($"Match found: {e.MatchId}");
-};
-
-await sdk.ConnectAsync();
-await sdk.Matchmaking.QueueForMatchAsync("default", 2, 4);
-await sdk.Chat.SendMessageAsync("Hello!");
-await sdk.GameState.SendMoveAsync(10.0, 20.0, 5.0);
-```
-
-## Demo & Testing
-
-### Web-Based Visual Demo
-
-The easiest way to test the server is using the included web client:
-
-1. Start the server (see "Running the Server" above)
-2. Open `demo/web-client/index.html` in your browser
-3. Click "Connect" to connect to the server
-4. Click "Join Game Grid" to spawn on the 8x8 grid
-5. Use arrow keys to move, Shift + arrow keys to shoot
-
-The web client provides a minimalistic dark-themed interface with:
-- Connection status and player stats
-- Matchmaking controls
-- Interactive 8x8 game board with client-side prediction
-- Chat system with activity log
-- Real-time game state synchronization
 
 ## Architecture
 
