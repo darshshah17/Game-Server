@@ -1,48 +1,18 @@
-# Multiplayer Game Server
+# Realtime Game Server
 
-A real-time multiplayer game server implementation in C++ with a C#/.NET client SDK. This project demonstrates server-side authoritative simulation with rollback/reconciliation, matchmaking, chat, and game state synchronization.
+A high-performance real-time multiplayer game server implementation in C++ with WebSocket support. Features server-side authoritative simulation, matchmaking, chat, and an interactive 8x8 grid-based game.
 
 ## Features
 
-- **Real-time Multiplayer Support**: WebSocket-based communication supporting concurrent players
-- **Server-side Authoritative Simulation**: Ensures fairness and anti-cheat protection
-- **Rollback/Reconciliation**: Handles network latency and packet loss gracefully
+- **High-Performance Server**: C++ server running at 120 ticks/second with ultra-low latency network polling
+- **Real-time Multiplayer**: WebSocket-based communication supporting multiple concurrent players
+- **Interactive Game**: 8x8 grid-based game with player movement and shooting mechanics
+- **Server-side Authoritative**: Ensures game integrity and prevents cheating
 - **Matchmaking System**: Automatic player matching based on game mode and player count
 - **Chat System**: Global and channel-based chat messaging
-- **Game State Synchronization**: Efficient state updates with tick-based simulation
-- **C# Client SDK**: Easy-to-use SDK for game client integration
-
-## Tech Stack
-
-- **Server**: C++17
-- **Client SDK**: C# / .NET 6.0
-- **Communication**: WebSockets
-- **Serialization**: JSON (using jsoncpp for C++, Newtonsoft.Json for C#)
-
-## Project Structure
-
-```
-Game Server/
-├── server/              # C++ server implementation
-│   ├── main.cpp        # Server entry point
-│   ├── GameServer.*    # Main server class
-│   ├── WebSocketServer.*  # WebSocket server wrapper
-│   ├── PlayerManager.*    # Player management
-│   ├── MatchmakingSystem.* # Matchmaking logic
-│   ├── ChatSystem.*       # Chat functionality
-│   ├── GameStateManager.* # Game state and rollback/reconciliation
-│   └── CMakeLists.txt     # Build configuration
-├── sdk/                 # C# client SDK
-│   ├── GameServerSDK.csproj
-│   ├── GameServerClient.cs  # Core WebSocket client
-│   ├── GameServerSDK.cs     # Main SDK entry point
-│   ├── MatchmakingAPI.cs    # Matchmaking API
-│   ├── ChatAPI.cs           # Chat API
-│   ├── GameStateAPI.cs      # Game state API
-│   └── EventArgs.cs         # Event argument classes
-└── examples/            # Example client implementations
-    └── ExampleClient/   # Basic C# client example
-```
+- **Client-side Prediction**: Instant local feedback for smooth player experience
+- **Web Demo Client**: Beautiful dark-themed web interface for testing and playing
+- **C# Client SDK**: Easy-to-use SDK for game client integration (Unity/Godot compatible)
 
 ## Building the Server
 
@@ -50,8 +20,8 @@ Game Server/
 
 - C++17 compatible compiler (GCC 7+, Clang 5+, MSVC 2017+)
 - CMake 3.15+
-- jsoncpp library
-- WebSocket library (uWebSockets, libwebsockets, or similar)
+- libwebsockets library (installed via Homebrew on macOS: `brew install libwebsockets`)
+- jsoncpp library (installed via Homebrew on macOS: `brew install jsoncpp`)
 
 ### Build Steps
 
@@ -66,8 +36,8 @@ make
 ### Running the Server
 
 ```bash
-./GameServer [port]
-# Default port is 8080
+cd server/build
+./GameServer 8080
 ```
 
 ## Building the SDK
@@ -116,39 +86,20 @@ await sdk.GameState.SendMoveAsync(10.0, 20.0, 5.0);
 
 ### Web-Based Visual Demo
 
-The easiest way to demonstrate the server is using the included web client:
+The easiest way to test the server is using the included web client:
 
-```bash
-cd demo/web-client
-python3 -m http.server 3000
-# Open http://localhost:3000 in your browser
-```
+1. Start the server (see "Running the Server" above)
+2. Open `demo/web-client/index.html` in your browser
+3. Click "Connect" to connect to the server
+4. Click "Join Game Grid" to spawn on the 8x8 grid
+5. Use arrow keys to move, Shift + arrow keys to shoot
 
-The web client provides a visual interface to:
-- Connect to the server
-- Request matchmaking
-- Send chat messages
-- Send game actions
-- View real-time events and metrics
-
-### Python Test Script
-
-For automated testing and demonstrating concurrent connections:
-
-```bash
-cd demo/test-scripts
-pip install -r requirements.txt
-python3 test_server.py
-```
-
-This script demonstrates:
-- Multiple concurrent WebSocket connections
-- Matchmaking with multiple players
-- Chat system functionality
-- Game action handling
-- Performance metrics
-
-See `demo/DEMO_GUIDE.md` for comprehensive demo instructions.
+The web client provides a minimalistic dark-themed interface with:
+- Connection status and player stats
+- Matchmaking controls
+- Interactive 8x8 game board with client-side prediction
+- Chat system with activity log
+- Real-time game state synchronization
 
 ## Architecture
 
@@ -156,16 +107,15 @@ See `demo/DEMO_GUIDE.md` for comprehensive demo instructions.
 
 The server maintains the authoritative game state and validates all player actions. This prevents cheating by ensuring:
 - Actions are validated before being applied
-- Game state is always consistent
-- Client predictions can be corrected via reconciliation
+- Game state is always consistent across all clients
+- State updates are broadcast only when changes occur (dirty state tracking)
 
-### Rollback/Reconciliation
+### Client-Side Prediction
 
-The server maintains snapshots of game state at regular intervals. When validation fails or corrections are needed:
-1. Server rolls back to a previous snapshot
-2. Replays actions from that point
-3. Sends corrected state to clients
-4. Clients reconcile their local state with server state
+The web client implements client-side prediction for instant local feedback:
+- Players see their own moves immediately (0ms latency)
+- Server confirms and corrects if needed
+- Smooth gameplay experience even with network latency
 
 ### Matchmaking
 
@@ -177,35 +127,26 @@ Players are queued by game mode and matched when enough players are available. T
 ### Chat System
 
 Supports multiple channels (global, match-specific, etc.):
-- Message validation and moderation
-- Message history per channel
-- Real-time broadcasting
+- Real-time message broadcasting
+- Activity log integration
 
-## Performance Considerations
+## Performance
 
-- **Tick Rate**: 60 ticks per second (configurable)
-- **Concurrent Players**: Designed to support 500+ concurrent players
-- **Latency**: Target < 100ms per action (depends on network conditions)
-- **State Updates**: Broadcasted efficiently to relevant players only
-
-## WebSocket Library Integration
-
-The current implementation includes a placeholder WebSocket server. For production use, integrate one of:
-
-1. **uWebSockets** (Recommended): High performance, lightweight
-2. **libwebsockets**: Mature, feature-rich
-3. **Boost.Beast**: Header-only, part of Boost
-
-Update `WebSocketServer.cpp` to use your chosen library.
+- **Tick Rate**: 120 ticks per second for ultra-low latency
+- **Network Polling**: 1ms timeout for minimal delay
+- **State Updates**: Only broadcasted when game state changes (dirty tracking)
+- **Client Prediction**: Instant local feedback with server reconciliation
+- **Optimized Rendering**: DOM recycling and efficient updates in web client
 
 ## License
 
 This project is provided as-is for educational and portfolio purposes.
 
-## Notes
+## Tech Stack
 
-- The WebSocket server implementation is a placeholder and needs to be replaced with a production-ready library
-- Additional game-specific logic should be added to `GameStateManager::simulateTick()` and `GameStateManager::applyAction()`
-- Anti-cheat validation in `GameStateManager::validateAction()` should be expanded based on game requirements
-- Consider adding authentication, rate limiting, and additional security measures for production use
+- **Server**: C++17 with libwebsockets
+- **Web Client**: Vanilla JavaScript, HTML5, CSS3
+- **Client SDK**: C# / .NET 6.0
+- **Communication**: WebSockets
+- **Serialization**: JSON (jsoncpp for C++)
 
