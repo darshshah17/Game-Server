@@ -11,8 +11,6 @@ A high-performance real-time multiplayer game server implementation in C++ and C
 
 2) **Real-time Multiplayer**: WebSocket-based communication supporting multiple concurrent players
   
-3) **Interactive Game**: 8x8 grid-based game with player movement and shooting mechanics
-  
 4) **Server-side Authoritative**: Ensures game integrity and prevents cheating
   
 5) **Matchmaking System**: Automatic player matching based on game mode and player count
